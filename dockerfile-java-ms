@@ -1,9 +1,8 @@
-FROM openjdk:14-jdk-alpine as MAVEN_BUILD
+FROM openjdk:14-jdk-alpine as BUILD
 
-LABEL key="riot90" 
+LABEL key="riot90"
 
-ARG WORKDIR="/build/"
-
+ARG WORKDIR="/app"
 WORKDIR ${WORKDIR}
 COPY ./ ${WORKDIR}/
 
@@ -11,7 +10,9 @@ RUN ./mvnw clean package
 
 FROM openjdk:14-jdk-alpine
 
+ARG WORKDIR="/app"
 WORKDIR ${WORKDIR}
-COPY --from=MAVEN_BUILD ${WORKDIR}/target/*.jar ${WORKDIR}/app.jar
+COPY --from=BUILD ${WORKDIR}/target/*.jar ${WORKDIR}/app.jar
+EXPOSE 8090
 
 CMD ["java", "-jar", "app.jar"]
